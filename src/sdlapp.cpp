@@ -13,6 +13,8 @@ extern "C"
 namespace sdlapp {
 
 SDLApp::~SDLApp() {
+	if(_sdl_initialized)
+		SDL_Quit();
 }
 // 
 // void SDLApp::OnQuit() {
@@ -50,22 +52,27 @@ void SDLApp::Setup() {
 	} catch(...) {
 	}
 
-	if (SDL_Init(SDL_INIT_VIDEO) != 0){
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		throw 1;
-	}
+	if(SDL_Init(SDL_INIT_VIDEO) != 0)
+		SDL_THROW(SDL_Init);
+	
+	_sdl_initialized = true;
 
 	CreateWnd();
 }
 
 void SDLApp::CreateWnd() {
-	_wnd.reset(SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN));
+	_wnd.reset(SDL_CreateWindow(_name.c_str(),
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		640, 480,
+		SDL_WINDOW_SHOWN));
 
-	if(!_wnd){
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-		SDL_Quit();
-		throw 2;
-	}
+	if(!_wnd)
+		SDL_THROW(SDL_CreateWindow);
+
+	_ren.reset(SDL_CreateRenderer(_wnd.get(), -1, 0));
+	if(!_ren)
+		SDL_THROW(SDL_CreateRenderer);
+
 
 // 	if (_fullscreen && _borderless)
 // 	{
@@ -167,16 +174,16 @@ void SDLApp::Loop() {
 // 			//continue;
 // 		}
 // 
-// 		if (Time::Elapsed(frame_time, 1000 / _framerate)) {
-// 			//_wnd->clear();
-// 			if(_cur_scene)
-// 				_cur_scene->Draw();
-// 
-// 			OnDraw();
-// 			_wnd->display();
-// 
-// 			frame_time = Time::Now();
-// 		}
+		if (Time::Elapsed(frame_time, 1000 / _framerate)) {
+			//_wnd->clear();
+			if(_cur_scene)
+				_cur_scene->Draw();
+
+			OnDraw();
+			SDL_RenderPresent(_ren.get());
+
+			frame_time = Time::Now();
+		}
 
 		if(_tick_sleep > 0)
 			Sleep(_tick_sleep);

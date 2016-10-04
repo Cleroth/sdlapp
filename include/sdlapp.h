@@ -1,5 +1,7 @@
 #pragma once
 
+#define SDL_THROW(name)		throw Exception(#name ## " failed: {}", SDL_GetError())
+
 namespace sdlapp {
 	struct SDLWindowDestroyer
 	{
@@ -10,6 +12,16 @@ namespace sdlapp {
 	};
 	using Window = SDL_Window;
 	using WindowPtr = UniquePtr<Window, SDLWindowDestroyer>;
+
+	struct SDLRendererDestroyer
+	{
+		void operator()(SDL_Renderer * w) const
+		{
+			SDL_DestroyRenderer(w);
+		}
+	};
+	using Renderer = SDL_Renderer;
+	using RendererPtr = UniquePtr<Renderer, SDLRendererDestroyer>;
 	using Event = SDL_Event;
 };
 
@@ -58,7 +70,11 @@ public:
 // 	void SetViewCenter(sf::Vector2f center);
 // 	void SetZoom(float zoom);
 //
+	RendererPtr _ren;
+
+private:
 	WindowPtr _wnd;
+	bool _sdl_initialized = false;
 // 
 // private:
 // 	struct Font {

@@ -6,7 +6,7 @@ namespace sdlapp {
 
 class Scene {
 public:
-	Scene(WindowPtr & wnd) : _wnd(wnd) {}
+	Scene(RendererPtr & ren) : _ren(ren) {}
 	virtual ~Scene() {}
 
 	virtual void Tick() {};
@@ -14,7 +14,7 @@ public:
 	virtual bool HandleEvent(Event & ev) = 0;
 
 protected:
-	WindowPtr & _wnd;
+	RendererPtr & _ren;
 };
 
 
