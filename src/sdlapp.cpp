@@ -91,21 +91,27 @@ void SDLApp::CreateWnd() {
 // 	_wnd->setVerticalSyncEnabled(true);
 }
  
-// void SDLApp::Loop() {
-// 	Time::Update();
-// 
-// 	auto frame_time = Time::Now() - 1000 / _framerate;
-// 	while(_running && g_con.IsRunning) {
-// 		Time::Update();
-// 
-// 		UpdateView();
-// 
-// 
-// 		OnTick();
-// 		if(_cur_scene)
-// 			_cur_scene->Tick();
-// 
-// 		sf::Event ev;
+void SDLApp::Loop() {
+	Time::Update();
+
+	auto frame_time = Time::Now() - 1000 / _framerate;
+	while(_running && g_con.IsRunning) {
+		Time::Update();
+
+		//UpdateView();
+
+		OnTick();
+		if(_cur_scene)
+			_cur_scene->Tick();
+
+		Event e;
+		while (SDL_PollEvent(&e)){
+			switch(e.type) {
+			case SDL_QUIT:
+				return;
+			}
+		}
+// 		Event ev;
 // 		while(_wnd->pollEvent(ev)) {
 // 			switch(ev.type) {
 // 			case sf::Event::MouseButtonPressed:
@@ -171,36 +177,36 @@ void SDLApp::CreateWnd() {
 // 
 // 			frame_time = Time::Now();
 // 		}
-// 
-// 		if(_tick_sleep > 0)
-// 			Sleep(_tick_sleep);
-// 	}
-// }
-// 
-// void SDLApp::AddFont(const String & name, u32 default_size,
-// 	sf::Color outline_color, float outline_size) {
-// 	sf::Font font;
-// 	if(!font.loadFromFile(kResourcesFolder + "ui_assets/fonts/"s + name))
-// 		throw std::domain_error("Failed to load font: " + name);
-// 
-// 	_fonts += Font{font, default_size, name, outline_color, outline_size};
-// }
-// 
-// void SDLApp::SetScene(UniquePtr<Scene> scene) {
-// 	_cur_scene = std::move(scene);
-// }
-// 
-// void SDLApp::SetFullscreen(bool enabled, bool update_wnd /*= true*/) {
-// 	_fullscreen = enabled;
-// 
-// 	if(update_wnd) {
-// 		CreateWnd();
-// 		// trigger a resized event
+
+		if(_tick_sleep > 0)
+			Sleep(_tick_sleep);
+	}
+}
+
+//void SDLApp::AddFont(const String & name, u32 default_size,
+//	sf::Color outline_color, float outline_size) {
+//	sf::Font font;
+//	if(!font.loadFromFile(kResourcesFolder + "ui_assets/fonts/"s + name))
+//		throw std::domain_error("Failed to load font: " + name);
+//
+//	_fonts += Font{font, default_size, name, outline_color, outline_size};
+//}
+
+void SDLApp::SetScene(UniquePtr<Scene> scene) {
+	_cur_scene = std::move(scene);
+}
+
+void SDLApp::SetFullscreen(bool enabled, bool update_wnd /*= true*/) {
+	_fullscreen = enabled;
+
+	if(update_wnd) {
+		CreateWnd();
+		// trigger a resized event
 // 		_wnd->setSize({_wnd->getSize().x - 1, _wnd->getSize().y});
 // 		_wnd->setSize({_wnd->getSize().x + 1, _wnd->getSize().y});
-// 	}
-// }
-// 
+	}
+}
+
 // void SDLApp::SetVSync(bool enabled) {
 // 	_wnd->setVerticalSyncEnabled(enabled);
 // }
